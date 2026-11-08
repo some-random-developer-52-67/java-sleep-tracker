@@ -31,6 +31,7 @@ class SleepTrackerAppTest {
                 Средняя продолжительность сессии сна (мин): 272,5
                 Количество сессий с плохим качеством сна: 1
                 Количество бессонных ночей: 0
+                Хронотип: Голубь
                 """.replace("\n", System.lineSeparator());
 
 
@@ -52,6 +53,28 @@ class SleepTrackerAppTest {
 
 
         assertTrue(output.contains("Количество бессонных ночей: 2" + System.lineSeparator()));
+    }
+
+    @Test
+    void printsOwlChronotypeInRussian() throws IOException {
+        Path path = writeLog("01.10.25 23:30;02.10.25 10:00;GOOD");
+
+
+        String output = runApp(path.toString());
+
+
+        assertTrue(output.contains("Хронотип: Сова" + System.lineSeparator()));
+    }
+
+    @Test
+    void printsLarkChronotypeInRussian() throws IOException {
+        Path path = writeLog("01.10.25 21:30;02.10.25 06:00;GOOD");
+
+
+        String output = runApp(path.toString());
+
+
+        assertTrue(output.contains("Хронотип: Жаворонок" + System.lineSeparator()));
     }
 
     @Test

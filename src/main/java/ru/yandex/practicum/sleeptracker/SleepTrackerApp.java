@@ -17,7 +17,8 @@ public class SleepTrackerApp {
             new MaximumDurationAnalysis(),
             new AverageDurationAnalysis(),
             new BadQualityCountAnalysis(),
-            new SleeplessNightsAnalysis()
+            new SleeplessNightsAnalysis(),
+            new ChronotypeAnalysis()
     );
 
     public static void main(String[] args) {
