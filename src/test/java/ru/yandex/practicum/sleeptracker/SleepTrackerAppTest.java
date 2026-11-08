@@ -19,7 +19,7 @@ class SleepTrackerAppTest {
     Path directory;
 
     @Test
-    void printsAllBasicMetricsWithDescriptions() throws IOException {
+    void printsAllRegisteredAnalysesWithDescriptions() throws IOException {
         Path path = writeLog("""
                 01.10.25 23:15;02.10.25 07:30;GOOD
                 02.10.25 14:10;02.10.25 15:00;BAD
@@ -30,6 +30,7 @@ class SleepTrackerAppTest {
                 Максимальная продолжительность сессии сна (мин): 495
                 Средняя продолжительность сессии сна (мин): 272,5
                 Количество сессий с плохим качеством сна: 1
+                Количество бессонных ночей: 0
                 """.replace("\n", System.lineSeparator());
 
 
@@ -37,6 +38,20 @@ class SleepTrackerAppTest {
 
 
         assertEquals(expected, output);
+    }
+
+    @Test
+    void printsSleeplessNightCount() throws IOException {
+        Path path = writeLog("""
+                01.10.25 23:00;02.10.25 08:00;GOOD
+                04.10.25 23:00;05.10.25 08:00;NORMAL
+                """);
+
+
+        String output = runApp(path.toString());
+
+
+        assertTrue(output.contains("Количество бессонных ночей: 2" + System.lineSeparator()));
     }
 
     @Test
