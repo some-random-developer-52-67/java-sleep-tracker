@@ -19,17 +19,41 @@ class SleepTrackerAppTest {
     Path directory;
 
     @Test
-    void printsSessionCountWithDescription() throws IOException {
+    void printsAllBasicMetricsWithDescriptions() throws IOException {
         Path path = writeLog("""
                 01.10.25 23:15;02.10.25 07:30;GOOD
-                02.10.25 14:10;02.10.25 15:00;NORMAL
+                02.10.25 14:10;02.10.25 15:00;BAD
+                """);
+        String expected = """
+                Количество сессий сна: 2
+                Минимальная продолжительность сессии сна (мин): 50
+                Максимальная продолжительность сессии сна (мин): 495
+                Средняя продолжительность сессии сна (мин): 272,5
+                Количество сессий с плохим качеством сна: 1
+                """.replace("\n", System.lineSeparator());
+
+
+        String output = runApp(path.toString());
+
+
+        assertEquals(expected, output);
+    }
+
+    @Test
+    void roundsAverageOnlyForOutput() throws IOException {
+        Path path = writeLog("""
+                01.10.25 14:00;01.10.25 15:00;GOOD
+                02.10.25 14:00;02.10.25 15:01;NORMAL
+                03.10.25 14:00;03.10.25 15:01;GOOD
                 """);
 
 
         String output = runApp(path.toString());
 
 
-        assertEquals("Количество сессий сна: 2" + System.lineSeparator(), output);
+        assertTrue(
+                output.contains("Средняя продолжительность сессии сна (мин): 60,67" + System.lineSeparator())
+        );
     }
 
     @Test

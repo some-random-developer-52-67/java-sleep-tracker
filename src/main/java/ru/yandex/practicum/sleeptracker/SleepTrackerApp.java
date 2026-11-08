@@ -2,13 +2,21 @@ package ru.yandex.practicum.sleeptracker;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 public class SleepTrackerApp {
 
+    private static final int MAX_FRACTION_DIGITS = 2;
+
     private static final List<Function<List<SleepingSession>, ? extends SleepAnalysisResult<?>>> ANALYSES = List.of(
-            new SessionCountAnalysis()
+            new SessionCountAnalysis(),
+            new MinimumDurationAnalysis(),
+            new MaximumDurationAnalysis(),
+            new AverageDurationAnalysis(),
+            new BadQualityCountAnalysis()
     );
 
     public static void main(String[] args) {
@@ -25,9 +33,19 @@ public class SleepTrackerApp {
                 return;
             }
 
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.forLanguageTag("ru-RU"));
+            numberFormat.setMaximumFractionDigits(MAX_FRACTION_DIGITS);
+            numberFormat.setGroupingUsed(false);
+
             ANALYSES.stream()
                     .map(analysis -> analysis.apply(sessions))
-                    .forEach(result -> System.out.println(result.description() + ": " + result.value()));
+                    .forEach(result -> {
+                        Object value = result.value() instanceof Number number
+                                ? numberFormat.format(number)
+                                : result.value();
+
+                        System.out.println(result.description() + ": " + value);
+                    });
         } catch (IOException exception) {
             System.out.println("Не удалось прочитать файл с логом сна: " + exception.getMessage());
         } catch (IllegalArgumentException exception) {
